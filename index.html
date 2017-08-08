@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>GifTastic</title>
+  <style type="text/css">
+    button,div,form,input {
+      margin: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- Animals show here -->
+    <div id="animalView"></div>
+
+      <form id="animal-form">
+        <label for="animal-input">Add an Animal</label>
+        <input type="text" id="animal-input"><br>
+        <!-- Button triggers new animal to be added -->
+        <input id="add-animal" type="submit" value="Add an Animal">
+      </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      // Initial array of animal
+    var topics=["cat","dog","lion","zebra","tiger","parrot","cow","rat","falcon","bird"];
+ 
+      // Function for displaying animal
+      function renderButtons() {
+
+        // (this is necessary otherwise we will have repeat buttons)
+        $("#animalView").empty();
+
+        $("#add-animal").on("click", function(event) {
+        // event.preventDefault() prevents the form from trying to submit itself.
+       
+        event.preventDefault();
+
+        // This line will grab the text from the input box
+        var animal = $("#animal-input").val().trim();
+        // The movie from the textbox is then added to our array
+        topics.push(animal);
+
+        // calling renderButtons which handles the processing of our animal array
+        renderButtons();
+      });
+
+        // Looping through the array of animal
+        for (var i = 0; i < topics.length; i++) {
+
+          // Then dynamicaly generating buttons for each animal in the array topics.
+          var animalName=topics[i]; 
+          var a = $("<button>");
+          // Adding a class
+          a.addClass("animal");
+          // Adding a data-attribute with a value of the animal at index i
+          a.attr("data-name", topics[i]);
+          // Providing the button's text with a value of the animal at index i
+          a.text(topics[i]);
+
+       
+          // Adding the button to the HTML
+          $("#animalView").append(a);
+        }
+      }
+       renderButtons();
+
+      $("button").on("click", function(event){
+
+ // $("button").click(function(){
+         
+        var queryURL = "http://api.giphy.com/v1/gifs/search?q=" +
+        $(this).text() + "&api_key=5c281ffd50774151bbfaf5dc85b25558&limit=10";
+        //alert(queryURL);
+
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+        .done(function(response){
+        //alert(response.data.length);
+        var animalView=$("#animalView"); 
+        //animalView.empty(); 
+          for (var i = 0; i < response.data.length; i++) {
+            
+            // Creating and storing a div tag
+            var animalDiv = $("<div>");
+            // Creating a paragraph tag with the result item's rating
+            var p = $("<p>").text("Rating: " + response.data[i].rating);
+
+            // Creating and storing an image tag
+            var animalImage = $("<img>");
+            // Setting the src attribute of the image to a property pulled off the result item
+            animalImage.attr("src",response.data[i].images.fixed_height.url);
+            //alert(response.data[i].images.fixed_height_still.url);
+             animalDiv.append(p);
+             animalDiv.append(animalImage);
+             // animalView.append(animalDiv);
+             $("#animalView").append(animalDiv);
+
+          }
+          //$("#animalView").prepend(animalDiv);
+           //animalView.empty();
+           //renderButtons();
+
+      });
+  
+  });
+  
+     
+    </script>
+  </div>
+</body>
+
+</html>
